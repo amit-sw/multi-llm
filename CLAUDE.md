@@ -6,6 +6,9 @@ This file contains technical details, architectural decisions, and important imp
 
 LLM Council is a 3-stage deliberation system where multiple LLMs collaboratively answer user questions. The key innovation is anonymized peer review in Stage 2, preventing models from playing favorites.
 
+
+
+
 ## Architecture
 
 ### Backend Structure (`backend/`)
