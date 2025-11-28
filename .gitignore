@@ -12,6 +12,8 @@ wheels/
 # Keys and secrets
 .env
 
+.streamlit/secrets.toml
+
 # Data files
 data/
 
