@@ -18,7 +18,7 @@ from backend.council import (
 
 os.environ['OPENROUTER_API_KEY'] = st.secrets['OPENROUTER_API_KEY']
 
-st.set_page_config(page_title="LLM Council", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="Multi-LLM", page_icon="🧠", layout="wide")
 
 
 def ensure_conversation():
