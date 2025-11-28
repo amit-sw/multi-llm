@@ -12,8 +12,6 @@ from backend.council import generate_conversation_title, stage1_collect_response
 #st.sidebar.json(st.secrets)
 
 os.environ['OPENROUTER_API_KEY'] = st.secrets['OPENROUTER_API_KEY']
-#                                              OPENROUTER_API_KEY="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"
-
 
 st.set_page_config(page_title="LLM Council", page_icon="🧠", layout="wide")
 
@@ -57,9 +55,9 @@ def main():
 
     # Sidebar with basic info
     with st.sidebar:
-        st.subheader("Session")
-        st.write(f"Conversation ID: `{conversation_id}`")
-        st.write("Messages:", len(conversation["messages"]))
+        #st.subheader("Session")
+        #st.write(f"Conversation ID: `{conversation_id}`")
+        #st.write("Messages:", len(conversation["messages"]))
         if st.button("Start new conversation"):
             st.session_state.pop("conversation_id", None)
             st.rerun()
