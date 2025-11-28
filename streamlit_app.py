@@ -7,7 +7,12 @@ import uuid
 import streamlit as st
 
 from backend import storage
-from backend.council import generate_conversation_title, stage1_collect_responses
+from backend.council import (
+    COUNCIL_MODELS,
+    generate_conversation_title,
+    stage1_collect_responses,
+    stage1_collect_responses_streaming,
+)
 
 #st.sidebar.json(st.secrets)
 
@@ -82,9 +87,27 @@ def main():
 
         # Run Stage 1 and display
         with st.chat_message("assistant"):
-            with st.spinner("Collecting responses from all models...", show_time=True):
-                stage1_results = asyncio.run(stage1_collect_responses(prompt))
-            render_assistant_message({"stage1": stage1_results})
+            tab_labels = [m.split("/")[-1] or m for m in COUNCIL_MODELS]
+            tabs = st.tabs(tab_labels)
+            placeholders = {}
+            for tab, model in zip(tabs, COUNCIL_MODELS):
+                with tab:
+                    ph = st.empty()
+                    ph.info("Waiting for response...")
+                    placeholders[model] = ph
+
+            async def stream_and_render():
+                results = []
+                async for resp in stage1_collect_responses_streaming(prompt):
+                    results.append(resp)
+                    ph = placeholders.get(resp["model"])
+                    if ph:
+                        with ph.container():
+                            st.caption(resp["model"])
+                            st.markdown(resp.get("response", ""))
+                return results
+
+            stage1_results = asyncio.run(stream_and_render())
 
         # Optionally update the title on first message
         if len(conversation["messages"]) == 0:

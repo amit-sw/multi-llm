@@ -3,6 +3,7 @@
 from typing import List, Dict, Any, Tuple
 from .openrouter import query_models_parallel, query_model
 from .config import COUNCIL_MODELS, CHAIRMAN_MODEL
+import asyncio
 
 
 async def stage1_collect_responses(user_query: str) -> List[Dict[str, Any]]:
@@ -30,6 +31,28 @@ async def stage1_collect_responses(user_query: str) -> List[Dict[str, Any]]:
             })
 
     return stage1_results
+
+
+async def stage1_collect_responses_streaming(user_query: str):
+    """
+    Like stage1_collect_responses but yields each model's response as it arrives.
+    Yields dicts with 'model' and 'response'.
+    """
+    messages = [{"role": "user", "content": user_query}]
+
+    async def run_model(model: str):
+        resp = await query_model(model, messages)
+        if resp is None:
+            return None
+        return {"model": model, "response": resp.get("content", "")}
+
+    tasks = {asyncio.create_task(run_model(model)): model for model in COUNCIL_MODELS}
+    results = []
+    for task in asyncio.as_completed(tasks):
+        result = await task
+        if result:
+            results.append(result)
+            yield result
 
 
 async def stage2_collect_rankings(
